@@ -68,7 +68,6 @@ The script will automatically:
 No manual configuration needed! Settings are saved automatically when you close the app.
 
 Everything is configurable from the sidebar:
-- **Username & Password** — Your Rule34.xxx account credentials
 - **Artist** — Your artist name (the `_(artist)` suffix is added automatically)
 - **Global Tags** — Tags applied to every image (default: `rating:explicit`)
 - **🤖 AI Generated Content** — Toggle whether to add the `ai_generated` tag
