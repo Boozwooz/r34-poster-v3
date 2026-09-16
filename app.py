@@ -756,25 +756,39 @@ class App(ctk.CTk):
         # ── Account ──────────────────────────────────────────────
         sec("🔑", "Rule34 Account")
 
-        lbl("Username")
-        self.uid_var = ctk.StringVar()
-        uid_entry = ent(self.uid_var, "your Rule34 username")
-        Tooltip(uid_entry, "Your Rule34.xxx username.\nFind it in your profile page.")
+        # Login info box
+        info_box = ctk.CTkFrame(sb, fg_color="#0d1f0d", corner_radius=8,
+                                border_color="#1a4a1a", border_width=1)
+        info_box.grid(row=r, column=0, padx=12, pady=(0, 8), sticky="ew"); r+=1
+        info_box.columnconfigure(0, weight=1)
 
-        lbl("Password")
-        self.key_var = ctk.StringVar()
-        pwd_entry = ent(self.key_var, "your Rule34 password", show="•")
-        Tooltip(pwd_entry, "Your Rule34.xxx account password.\nStored locally in config.json only.")
+        ctk.CTkLabel(
+            info_box,
+            text="How login works:",
+            text_color=GREEN, anchor="w",
+            font=ctk.CTkFont(size=10, weight="bold"),
+        ).grid(row=0, column=0, padx=10, pady=(8, 2), sticky="w")
 
-        # Test Connection button
-        test_btn = ctk.CTkButton(
-            sb, text="🔌  Test Connection",
-            command=self._test_connection, height=28, corner_radius=6,
-            fg_color=PANEL, hover_color=BORDER, text_color=TEXT2,
+        ctk.CTkLabel(
+            info_box,
+            text=(
+                "1. Click  Start Upload\n"
+                "2. A browser window opens\n"
+                "3. Log in to Rule34 once\n"
+                "4. Your session is saved\n"
+                "    automatically forever"
+            ),
+            text_color=TEXT2, anchor="w", justify="left",
             font=ctk.CTkFont(size=10),
-        )
-        test_btn.grid(row=r, column=0, padx=12, pady=(2,4), sticky="ew"); r+=1
-        Tooltip(test_btn, "Verify your credentials can reach Rule34.xxx\nbefore starting a bulk upload.")
+        ).grid(row=1, column=0, padx=10, pady=(0, 8), sticky="w")
+
+        ctk.CTkLabel(
+            info_box,
+            text="No need to enter your password\nin the app — ever.",
+            text_color=TEXT3, anchor="w", justify="left",
+            font=ctk.CTkFont(size=9),
+        ).grid(row=2, column=0, padx=10, pady=(0, 8), sticky="w")
+
         sep()
 
         # ── Content ──────────────────────────────────────────────
@@ -1139,12 +1153,6 @@ class App(ctk.CTk):
     def _upload(self):
         if self._uploading:
             return
-        username = self.uid_var.get().strip()
-        pwd = self.key_var.get().strip()
-        if not username or not pwd:
-            messagebox.showerror("Missing Credentials",
-                                 "Please enter your Rule34 Username and Password.")
-            return
         if not self._cards:
             messagebox.showinfo("Info", "No images in the queue.")
             return
@@ -1152,8 +1160,9 @@ class App(ctk.CTk):
             "Confirm Upload",
             f"Upload {len(self._cards)} image(s) via browser automation?\n\n"
             f"1. A browser window will open.\n"
-            f"2. If a CAPTCHA appears, solve it manually.\n"
-            f"3. The tool will handle the rest!"
+            f"2. Log in to Rule34 if prompted (first time only).\n"
+            f"3. Solve any CAPTCHA when asked.\n"
+            f"4. The tool will handle the rest!"
         ):
             return
         self._clean()
@@ -1163,20 +1172,18 @@ class App(ctk.CTk):
         threading.Thread(target=self._upload_t, daemon=True).start()
 
     def _upload_t(self):
-        username  = self.uid_var.get().strip()
-        pwd       = self.key_var.get().strip()
         art       = self.artist_var.get().strip()
         gtags     = self.gtags_var.get().strip()
         gsrc      = self.gsrc_var.get().strip()
         delay     = self.delay_var.get()
-        ai_gen    = self.ai_gen_var.get()   # AI Generated checkbox state
+        ai_gen    = self.ai_gen_var.get()
         n         = len(self._cards)
         ok = fail = 0
 
         try:
             from playwright.sync_api import sync_playwright
         except ImportError:
-            self._q.put(("st", "Error: Playwright is not installed! Run: pip install playwright && playwright install chromium"))
+            self._q.put(("st", "Error: Playwright not installed. Run RUN.bat to fix this."))
             self._q.put(("upload_done", None))
             return
 
@@ -1185,7 +1192,7 @@ class App(ctk.CTk):
                 self._q.put(("st", "Opening browser…"))
                 browser_data = str(Path("browser_data").absolute())
 
-                # Persistent context to keep login session across uploads
+                # Persistent context — keeps login session saved between runs
                 context = p.chromium.launch_persistent_context(
                     user_data_dir=browser_data,
                     headless=False,
@@ -1194,21 +1201,22 @@ class App(ctk.CTk):
                 )
                 page = context.pages[0] if context.pages else context.new_page()
 
-                # --- 1. LOGIN ---
-                self._q.put(("st", "Checking Rule34 login status…"))
+                # --- 1. LOGIN CHECK ---
+                self._q.put(("st", "Checking login status…"))
                 page.goto("https://rule34.xxx/index.php?page=account&s=login",
                           wait_until="domcontentloaded")
 
                 if page.locator('input[name="user"]').is_visible():
-                    self._q.put(("st", "Filling credentials (solve CAPTCHA if prompted)…"))
-                    page.fill('input[name="user"]', username)
-                    page.fill('input[name="pass"]', pwd)
-
-                    # Wait for successful login (logout link appears), up to 5 min
+                    # Not logged in — let the user do it manually in the browser
+                    self._q.put(("st", "Please log in to Rule34 in the browser window. Waiting…"))
                     try:
+                        # Wait up to 5 minutes for the user to log in
                         page.wait_for_selector('a[href*="s=logout"]', timeout=300000)
+                        self._q.put(("st", "Logged in! Session saved for future uploads."))
                     except Exception:
                         raise RuntimeError("Login timed out. Please try again.")
+                else:
+                    self._q.put(("st", "Already logged in. Starting uploads…"))
 
                 # --- 2. UPLOADS ---
                 for i, c in enumerate(self._cards):
@@ -1352,8 +1360,6 @@ class App(ctk.CTk):
     # ══════════════════════════════════════════════════════════
     def _load_cfg(self):
         c = self._cfg
-        self.uid_var.set(c.get("user_id", ""))
-        self.key_var.set(c.get("api_key", ""))
         self.artist_var.set(c.get("artist", ""))
         self.gtags_var.set(c.get("global_tags", "rating:explicit"))
         self.gsrc_var.set(c.get("global_source", ""))
@@ -1367,8 +1373,6 @@ class App(ctk.CTk):
 
     def _save(self):
         save_config({
-            "user_id":        self.uid_var.get().strip(),
-            "api_key":        self.key_var.get().strip(),
             "artist":         self.artist_var.get().strip(),
             "global_tags":    self.gtags_var.get().strip(),
             "global_source":  self.gsrc_var.get().strip(),
