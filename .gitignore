@@ -1,0 +1,30 @@
+# --- Personal credentials (NEVER commit this) ---
+config.json
+
+# --- Browser session data (contains cookies & login state) ---
+browser_data/
+
+# --- Python cache ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+
+# --- Virtual environments ---
+.venv/
+venv/
+env/
+ENV/
+
+# --- Distribution / packaging ---
+*.egg-info/
+dist/
+build/
+
+# --- Logs ---
+*.log
+
+# --- OS files ---
+.DS_Store
+Thumbs.db

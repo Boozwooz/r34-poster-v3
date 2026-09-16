@@ -1,0 +1,10 @@
+{
+  "user_id": "your_rule34_username",
+  "api_key": "your_rule34_password",
+  "artist": "your_artist_name",
+  "global_tags": "rating:explicit",
+  "global_source": "https://your-source-url.com",
+  "ai_generated": true,
+  "delay": 6,
+  "wd14_threshold": 0.35
+}

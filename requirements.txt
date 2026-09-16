@@ -1,0 +1,13 @@
+# Core GUI & image processing
+customtkinter>=5.2.0
+Pillow>=10.0.0
+requests>=2.31.0
+
+# WD14 AI tagger
+onnxruntime>=1.17.0
+huggingface_hub>=0.20.0
+numpy>=1.24.0
+
+# Browser automation for uploads
+# After pip install, also run: playwright install chromium
+playwright
