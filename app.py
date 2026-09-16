@@ -549,7 +549,7 @@ class ImageCard(ctk.CTkFrame):
             thumb = ctk.CTkLabel(self, text="?", width=56, height=56,
                                   fg_color=PANEL, corner_radius=6,
                                   text_color=TEXT3)
-        thumb.grid(row=0, column=0, rowspan=5,
+        thumb.grid(row=0, column=0, rowspan=7,
                    padx=(10, 8), pady=10, sticky="n")
 
         # ── Header: filename + badge + remove button ──────────────
@@ -586,24 +586,32 @@ class ImageCard(ctk.CTkFrame):
             height=30,
         )
         self.char_entry.grid(row=1, column=1, sticky="ew",
-                              padx=(0,10), pady=(0,3))
+                              padx=(0,10), pady=(0,1))
+        ctk.CTkLabel(
+            self, text="  Include both the character name AND the series name, separated by a space.",
+            text_color=TEXT3, font=ctk.CTkFont(size=9), anchor="w",
+        ).grid(row=2, column=1, sticky="ew", padx=(0,10), pady=(0,4))
 
         self.tags_entry = AutocompleteEntry(
             self,
             placeholder="🏷  Descriptive Tags  (autocomplete active — type to see suggestions)",
             height=30,
         )
-        self.tags_entry.grid(row=2, column=1, sticky="ew",
-                              padx=(0,10), pady=(0,3))
+        self.tags_entry.grid(row=3, column=1, sticky="ew",
+                              padx=(0,10), pady=(0,1))
+        ctk.CTkLabel(
+            self, text="  Separate tags with spaces · Use underscores for multi-word tags (e.g. blue_eyes, big_breasts)",
+            text_color=TEXT3, font=ctk.CTkFont(size=9), anchor="w",
+        ).grid(row=4, column=1, sticky="ew", padx=(0,10), pady=(0,4))
 
         self.src_entry = ctk.CTkEntry(
             self,
-            placeholder_text="🔗  Source URL  (e.g. https://twitter.com/…  — optional)",
+            placeholder_text="🔗  Source URL  (link to the original post/tweet where you published this image — optional)",
             height=26,
             fg_color=PANEL, border_color=BORDER,
             text_color=TEXT1, placeholder_text_color=TEXT3,
         )
-        self.src_entry.grid(row=3, column=1, sticky="ew",
+        self.src_entry.grid(row=5, column=1, sticky="ew",
                              padx=(0,10), pady=(0,10))
 
         # Validation label (hidden until validation runs)
@@ -621,18 +629,18 @@ class ImageCard(ctk.CTkFrame):
     def show_validation(self, unknown: list[str]):
         if unknown:
             self._val_lbl.configure(
-                text=f"⚠  Not found on R34: {', '.join(unknown)}",
+                text=f"⚠  Not found on Rule34 (typo? or tag doesn't exist yet): {', '.join(unknown)}",
                 text_color=YELLOW,
             )
             self.set_status("⚠ Unknown Tags")
         else:
             self._val_lbl.configure(
-                text="✓  All tags exist on Rule34",
+                text="✓  All tags exist on Rule34 — good to go!",
                 text_color=GREEN,
             )
             self.set_status("Validated ✓")
         if not self._has_val:
-            self._val_lbl.grid(row=4, column=1, sticky="ew",
+            self._val_lbl.grid(row=6, column=1, sticky="ew",
                                 padx=(0,10), pady=(0,8))
             self._has_val = True
 
@@ -831,19 +839,41 @@ class App(ctk.CTk):
         gtags_entry = ent(self.gtags_var, "rating:explicit")
         Tooltip(gtags_entry, "Tags applied to every image.\nSeparate with spaces.")
 
+        # Rating tags mini-legend
+        rating_box = ctk.CTkFrame(sb, fg_color="#111118", corner_radius=6,
+                                   border_color=BORDER, border_width=1)
+        rating_box.grid(row=r, column=0, padx=12, pady=(0,6), sticky="ew"); r+=1
+        rating_box.columnconfigure(0, weight=1)
+        ctk.CTkLabel(rating_box, text="Rating tag — pick one:",
+                     text_color=TEXT3, font=ctk.CTkFont(size=9, weight="bold"),
+                     anchor="w").grid(row=0, column=0, padx=8, pady=(5,2), sticky="w")
+        ratings_row = ctk.CTkFrame(rating_box, fg_color="transparent")
+        ratings_row.grid(row=1, column=0, padx=6, pady=(0,6), sticky="w")
+        for col, (tag, color, desc) in enumerate([
+            ("rating:explicit",      RED,    "18+ / NSFW"),
+            ("rating:questionable",  YELLOW, "Suggestive"),
+            ("rating:safe",          GREEN,  "Safe / SFW"),
+        ]):
+            f = ctk.CTkFrame(ratings_row, fg_color="transparent")
+            f.grid(row=0, column=col, padx=(0,8))
+            ctk.CTkLabel(f, text=tag, text_color=color,
+                         font=ctk.CTkFont(size=8, weight="bold")).pack(anchor="w")
+            ctk.CTkLabel(f, text=desc, text_color=TEXT3,
+                         font=ctk.CTkFont(size=8)).pack(anchor="w")
+
         lbl("Global Source URL")
         self.gsrc_var = ctk.StringVar()
         src_entry = ent(self.gsrc_var, "https://…  (optional, applied to all images)")
-        Tooltip(src_entry, "Source URL applied to all images.\nCan be overridden per-image in each card.")
+        Tooltip(src_entry, "Where did you originally post these images?\n(e.g. your Twitter/X, Pixiv, or Patreon link)\nThis is shown on Rule34 as the image source.\nCan be overridden per-image in each card.")
         sep()
 
         # ── Settings ─────────────────────────────────────────────
         sec("⚙", "Settings")
 
         self.delay_var = ctk.IntVar(value=6)
-        lbl("Anti-ban delay between uploads")
+        lbl("Wait time between uploads  (anti-ban)")
         drow = ctk.CTkFrame(sb, fg_color="transparent")
-        drow.grid(row=r, column=0, padx=12, sticky="ew", pady=(2,6)); r+=1
+        drow.grid(row=r, column=0, padx=12, sticky="ew", pady=(2,2)); r+=1
         drow.columnconfigure(0, weight=1)
         self._dlbl = ctk.CTkLabel(drow, text="6 s", width=38, text_color=ACCENT,
                                    font=ctk.CTkFont(size=13, weight="bold"))
@@ -854,12 +884,14 @@ class App(ctk.CTk):
                        command=lambda v: self._dlbl.configure(
                            text=f"{int(float(v))} s"))
         delay_slider.grid(row=0, column=0, sticky="ew")
-        Tooltip(delay_slider, "Wait time between each upload to avoid\nbeing rate-limited or banned. Min: 3s, Max: 30s.")
+        ctk.CTkLabel(sb, text="  Too low = risk of ban. 6s is safe for most cases.",
+                     text_color=TEXT3, font=ctk.CTkFont(size=9), anchor="w").grid(
+            row=r, column=0, padx=14, pady=(0,6), sticky="w"); r+=1
 
         self.thresh_var = ctk.DoubleVar(value=0.35)
-        lbl("WD14 Threshold  (lower = more tags)")
+        lbl("AI Tagger Sensitivity  (WD14)")
         trow = ctk.CTkFrame(sb, fg_color="transparent")
-        trow.grid(row=r, column=0, padx=12, sticky="ew", pady=(2,8)); r+=1
+        trow.grid(row=r, column=0, padx=12, sticky="ew", pady=(2,2)); r+=1
         trow.columnconfigure(0, weight=1)
         self._tlbl = ctk.CTkLabel(trow, text="0.35", width=38, text_color=ACCENT,
                                    font=ctk.CTkFont(size=13, weight="bold"))
@@ -870,7 +902,12 @@ class App(ctk.CTk):
                        command=lambda v: self._tlbl.configure(
                            text=f"{float(v):.2f}"))
         thresh_slider.grid(row=0, column=0, sticky="ew")
-        Tooltip(thresh_slider, "Confidence threshold for WD14 AI tagger.\nLower = more tags (noisier). Higher = fewer tags (stricter).\nRecommended: 0.30–0.45")
+        ctk.CTkLabel(sb,
+                     text="  0.20 = lots of tags   0.35 = balanced   0.60 = few tags\n"
+                          "  Start at 0.35 — adjust if results are too noisy or sparse.",
+                     text_color=TEXT3, font=ctk.CTkFont(size=9),
+                     anchor="w", justify="left").grid(
+            row=r, column=0, padx=14, pady=(0,8), sticky="w"); r+=1
         sep()
 
         # ── Numbered action buttons ───────────────────────────────
@@ -1094,26 +1131,44 @@ class App(ctk.CTk):
         if not self._cards:
             messagebox.showinfo("Info", "No images in the queue.")
             return
+        # Warn on first run if model is not yet cached
+        cache_dir = Path.home() / ".cache" / "huggingface" / "hub"
+        model_cached = cache_dir.exists() and any(
+            cache_dir.glob("*wd*tagger*")
+        )
+        if not model_cached and not WD14Tagger._loaded:
+            if not messagebox.askyesno(
+                "AI Tagger — First Time Setup",
+                "The WD14 AI tagger model needs to be downloaded.\n\n"
+                "Download size:  ~680 MB  (one-time only)\n"
+                "Time:  a few minutes depending on your connection\n\n"
+                "After this first download, the model is saved on your\n"
+                "computer and reused instantly every time.\n\n"
+                "Start the download now?"
+            ):
+                return
         thr = round(self.thresh_var.get(), 2)
         threading.Thread(target=self._autotag_t, args=(thr,), daemon=True).start()
 
     def _autotag_t(self, thr: float):
         n = len(self._cards)
-        self._q.put(("st", "Loading WD14… (first run downloads ~680 MB from HuggingFace)"))
+        self._q.put(("st", "Loading AI tagger… (first run: downloading ~680 MB, please wait)"))
         for i, c in enumerate(self._cards):
             fname = Path(c.filepath).name
-            self._q.put(("st", f"WD14  {i+1}/{n}  —  {fname}"))
+            self._q.put(("st", f"Tagging image {i+1} of {n}  —  {fname}"))
             self._q.put(("pb", i / n))
             try:
                 tags = WD14Tagger.predict(c.filepath, thr)
                 self._q.put(("set_tags", (c, " ".join(tags))))
                 self._q.put(("set_status", (c, "Tagged")))
+                self._q.put(("st", f"Image {i+1}/{n} tagged — {len(tags)} tags found  ({fname})"))
                 log.info(f"[{i+1}/{n}] {len(tags)} tags → {fname}")
             except Exception as e:
                 log.error(f"WD14 error: {e}")
                 self._q.put(("set_status", (c, "Error ✗")))
+                self._q.put(("st", f"Error tagging {fname} — try again or tag manually"))
         self._q.put(("pb", 1.0))
-        self._q.put(("st", f"Auto-tagging complete ({n} images)"))
+        self._q.put(("st", f"Done! All {n} image(s) tagged. Run  ③ Clean Tags  next."))
 
     def _clean(self):
         for c in self._cards:
@@ -1131,15 +1186,17 @@ class App(ctk.CTk):
 
     def _validate_t(self):
         n = len(self._cards)
-        self._q.put(("st", "Validating tags…"))
+        self._q.put(("st", "Checking tags against Rule34 database…"))
         for i, c in enumerate(self._cards):
             self._q.put(("pb", i / n))
-            self._q.put(("st", f"Validating {i+1}/{n}  —  {Path(c.filepath).name}"))
+            self._q.put(("st", f"Checking image {i+1} of {n}  —  {Path(c.filepath).name}"))
             unknown = TagValidator.check_string(c.get_char() + " " + c.get_tags())
             self._q.put(("validation", (c, unknown)))
             time.sleep(0.3)
         self._q.put(("pb", 1.0))
-        self._q.put(("st", "Validation complete — check the badges on each card"))
+        self._q.put(("st",
+            "Validation done! Amber badges = unknown tags (fix or ignore). "
+            "Green badges = all good. You can upload now."))
 
     def _test_connection(self):
         """Quick connectivity check to rule34.xxx."""
