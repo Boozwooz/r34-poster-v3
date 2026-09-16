@@ -812,6 +812,20 @@ class App(ctk.CTk):
         art_entry = ent(self.artist_var, "name  (_(artist) appended automatically)")
         Tooltip(art_entry, "Your artist name. The suffix _(artist) is\nadded automatically to match booru format.")
 
+        # Warning box for artist tag
+        art_warn = ctk.CTkFrame(sb, fg_color="#1f1500", corner_radius=6,
+                                border_color="#3d2a00", border_width=1)
+        art_warn.grid(row=r, column=0, padx=12, pady=(0, 6), sticky="ew"); r+=1
+        art_warn.columnconfigure(0, weight=1)
+        ctk.CTkLabel(
+            art_warn,
+            text="⚠  The artist tag must already exist\n"
+                 "on Rule34 or the upload will fail.\n"
+                 "It is NOT checked by  ④  Validate.",
+            text_color=YELLOW, anchor="w", justify="left",
+            font=ctk.CTkFont(size=9),
+        ).grid(row=0, column=0, padx=8, pady=6, sticky="w")
+
         lbl("Global Tags")
         self.gtags_var = ctk.StringVar()
         gtags_entry = ent(self.gtags_var, "rating:explicit")
