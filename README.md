@@ -7,7 +7,7 @@
 [![Python](https://img.shields.io/badge/Python-3.10%2B-3776ab?logo=python&logoColor=white)](https://www.python.org/)
 [![CustomTkinter](https://img.shields.io/badge/GUI-CustomTkinter-6366F1)](https://github.com/TomSchimansky/CustomTkinter)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![100% Vibe Coded](https://img.shields.io/badge/100%25-Vibe%20Coded%20🤖-blueviolet)](https://github.com/BoozAIYaoi/r34-poster)
+[![100% Vibe Coded](https://img.shields.io/badge/100%25-Vibe%20Coded%20🤖-blueviolet)](https://github.com/Boozwooz/r34-poster-v3)
 [![Windows](https://img.shields.io/badge/Platform-Windows-0078d7?logo=windows)](https://www.microsoft.com/windows)
 
 *Queue up your images, auto-tag them with WD14 AI, clean & validate tags,*  
@@ -101,11 +101,11 @@ Checks every tag against the Rule34 autocomplete API. Unknown tags show in **amb
 
 ### ⑤ Start Upload
 Opens a Chromium browser window and uploads all images:
-1. Your credentials are pre-filled on the login page
-2. **Solve any CAPTCHA manually** when prompted
-3. For each image, the app fills in the file, tags, source, and rating
-4. **Solve the upload CAPTCHA** and click Upload — the app detects it and moves to the next image
-5. An anti-ban delay is applied between each upload
+1. **Log in once manually** if prompted (your session is saved forever).
+2. **IMPORTANT: Go to the Upload page yourself!** (The bot will not automatically redirect you from the login/account page).
+3. For each image, the app automatically fills in the file, tags, source, and rating.
+4. **Solve the upload CAPTCHA** and click **Upload** yourself — the app detects the upload and moves to the next image.
+5. An anti-ban delay is applied between each upload.
 
 ---
 

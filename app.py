@@ -1,6 +1,6 @@
 """
-BoozStudio — R34 Poster  v3.0
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+BoozStudio — R34 Poster  v3.2.0
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 100% vibe-coded. AI-assisted from start to finish.
 
 Critical WD14 bug fix (v1/v2 → v3):
@@ -671,7 +671,7 @@ class App(ctk.CTk):
         ctk.set_default_color_theme("blue")
         self.configure(fg_color=BG)
 
-        self.title("BoozStudio — R34 Poster  v3.0")
+        self.title("BoozStudio — R34 Poster  v3.2.0")
         self.geometry("1320x860")
         self.minsize(1040, 660)
 
@@ -756,7 +756,7 @@ class App(ctk.CTk):
                      text_color=TEXT1,
                      font=ctk.CTkFont(size=14, weight="bold")).grid(
             row=r, column=0, padx=16, pady=(0,2), sticky="w"); r+=1
-        ctk.CTkLabel(sb, text="v3.0  •  Batch Tagger & Uploader",
+        ctk.CTkLabel(sb, text="v3.2.0  •  Batch Tagger & Uploader",
                      text_color=TEXT3, font=ctk.CTkFont(size=10)).grid(
             row=r, column=0, padx=16, pady=(0,6), sticky="w"); r+=1
         sep()
@@ -781,20 +781,20 @@ class App(ctk.CTk):
             info_box,
             text=(
                 "1. Click  Start Upload\n"
-                "2. A browser window opens\n"
-                "3. Log in to Rule34 once\n"
-                "4. Your session is saved\n"
-                "    automatically forever"
+                "2. Browser opens & you log in\n"
+                "3. IMPORTANT: Go to Upload page\n"
+                "    (the bot won't navigate there!)\n"
+                "4. Session saved for next time"
             ),
             text_color=TEXT2, anchor="w", justify="left",
             font=ctk.CTkFont(size=10),
-        ).grid(row=1, column=0, padx=10, pady=(0, 8), sticky="w")
+        ).grid(row=1, column=0, padx=10, pady=(0, 4), sticky="w")
 
         ctk.CTkLabel(
             info_box,
-            text="No need to enter your password\nin the app — ever.",
-            text_color=TEXT3, anchor="w", justify="left",
-            font=ctk.CTkFont(size=9),
+            text="⚠ Note: The bot does NOT go to the Upload\npage automatically. You must open it yourself!",
+            text_color=YELLOW, anchor="w", justify="left",
+            font=ctk.CTkFont(size=9, weight="bold"),
         ).grid(row=2, column=0, padx=10, pady=(0, 8), sticky="w")
 
         sep()
@@ -940,6 +940,35 @@ class App(ctk.CTk):
         action_btn("④", "Validate on Rule34",       self._validate, "#2a2006", "#3a2c08",
                    tip="Check every tag against Rule34's autocomplete API.\nUnknown tags are highlighted in amber.")
 
+        # Upload flow info box
+        upload_info = ctk.CTkFrame(sb, fg_color="#0a1520", corner_radius=8,
+                                    border_color="#1a3a5a", border_width=1)
+        upload_info.grid(row=r, column=0, padx=12, pady=(4,4), sticky="ew"); r+=1
+        upload_info.columnconfigure(0, weight=1)
+        ctk.CTkLabel(upload_info, text="What happens when you upload:",
+                     text_color="#6ab0de", anchor="w",
+                     font=ctk.CTkFont(size=10, weight="bold"),
+        ).grid(row=0, column=0, padx=10, pady=(8,3), sticky="w")
+        ctk.CTkLabel(upload_info,
+                     text=(
+                         "1. A browser window opens\n"
+                         "2. Log in to Rule34 if asked\n"
+                         "3. GO to the Upload page manually!\n"
+                         "    (the bot will NOT do this alone)\n"
+                         "4. The app fills in tags, file & rating\n"
+                         "5. YOU solve the CAPTCHA\n"
+                         "6. YOU click the Upload button\n"
+                         "7. The app detects it and moves on"
+                     ),
+                     text_color=TEXT2, anchor="w", justify="left",
+                     font=ctk.CTkFont(size=10),
+        ).grid(row=1, column=0, padx=10, pady=(0,4), sticky="w")
+        ctk.CTkLabel(upload_info,
+                     text="⚠ You must open the Upload page yourself\nafter logging in! Then solve CAPTCHA & click Upload.",
+                     text_color=YELLOW, anchor="w", justify="left",
+                     font=ctk.CTkFont(size=9, weight="bold"),
+        ).grid(row=2, column=0, padx=10, pady=(0,8), sticky="w")
+
         # Main upload button (prominent)
         self._upload_btn = ctk.CTkButton(
             sb, text="⑤   Start Upload",
@@ -948,8 +977,8 @@ class App(ctk.CTk):
             text_color="white",
             font=ctk.CTkFont(size=14, weight="bold"),
         )
-        self._upload_btn.grid(row=r, column=0, padx=12, pady=(4,2), sticky="ew"); r+=1
-        Tooltip(self._upload_btn, "Open a browser window and upload all images.\nYou may need to solve CAPTCHAs manually.")
+        self._upload_btn.grid(row=r, column=0, padx=12, pady=(0,2), sticky="ew"); r+=1
+        Tooltip(self._upload_btn, "Open a browser window and upload all images.\nYou must navigate to upload page, solve CAPTCHA, and click Upload.")
 
         ctk.CTkButton(
             sb, text="🗑   Clear List",
@@ -988,7 +1017,7 @@ class App(ctk.CTk):
             row=r, column=0, padx=14, pady=(10,4), sticky="w"); r+=1
 
         ctk.CTkLabel(sb,
-                     text="BoozStudio — R34 Poster v3.0\n100% Vibe-Coded  🤖\n\nOpen Source — MIT License",
+                     text="BoozStudio — R34 Poster v3.2.0\n100% Vibe-Coded  🤖\n\nOpen Source — MIT License",
                      text_color=TEXT3, font=ctk.CTkFont(size=9),
                      anchor="w", justify="left").grid(
             row=r, column=0, padx=16, pady=(0,4), sticky="w"); r+=1
@@ -996,7 +1025,7 @@ class App(ctk.CTk):
         ctk.CTkButton(
             sb, text="⭐  View on GitHub",
             command=lambda: __import__("webbrowser").open(
-                "https://github.com/BoozAIYaoi/r34-poster"),
+                "https://github.com/Boozwooz/r34-poster-v3"),
             height=26, corner_radius=6,
             fg_color=PANEL, hover_color=BORDER, text_color=TEXT2,
             font=ctk.CTkFont(size=10),
@@ -1232,8 +1261,10 @@ class App(ctk.CTk):
             f"Upload {len(self._cards)} image(s) via browser automation?\n\n"
             f"1. A browser window will open.\n"
             f"2. Log in to Rule34 if prompted (first time only).\n"
-            f"3. Solve any CAPTCHA when asked.\n"
-            f"4. The tool will handle the rest!"
+            f"3. IMPORTANT: Go to the Upload page manually!\n"
+            f"   (the bot does NOT navigate there alone)\n"
+            f"4. The tool will fill in the tags, file & rating.\n"
+            f"5. Solve CAPTCHA and click Upload yourself!"
         ):
             return
         self._clean()
@@ -1279,15 +1310,15 @@ class App(ctk.CTk):
 
                 if page.locator('input[name="user"]').is_visible():
                     # Not logged in — let the user do it manually in the browser
-                    self._q.put(("st", "Please log in to Rule34 in the browser window. Waiting…"))
+                    self._q.put(("st", "Please log in to Rule34 AND navigate to the Upload page. Waiting…"))
                     try:
                         # Wait up to 5 minutes for the user to log in
                         page.wait_for_selector('a[href*="s=logout"]', timeout=300000)
-                        self._q.put(("st", "Logged in! Session saved for future uploads."))
+                        self._q.put(("st", "Logged in! Navigating to upload page…"))
                     except Exception:
                         raise RuntimeError("Login timed out. Please try again.")
                 else:
-                    self._q.put(("st", "Already logged in. Starting uploads…"))
+                    self._q.put(("st", "Already logged in. Opening Upload page…"))
 
                 # --- 2. UPLOADS ---
                 for i, c in enumerate(self._cards):
@@ -1315,7 +1346,7 @@ class App(ctk.CTk):
                     page.goto("https://rule34.xxx/index.php?page=post&s=add",
                               wait_until="domcontentloaded")
 
-                    self._q.put(("st", f"[{i+1}/{n}] Waiting for upload page (CAPTCHA?)…"))
+                    self._q.put(("st", f"[{i+1}/{n}] Please ensure you are on the Upload page (waiting for upload form)…"))
                     page.wait_for_selector('input[type="file"][name="upload"]', timeout=300000)
 
                     self._q.put(("st", f"[{i+1}/{n}] Filling in fields…"))

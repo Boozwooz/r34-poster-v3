@@ -4,7 +4,7 @@ color 0A
 
 echo.
 echo  ============================================================
-echo   BoozStudio - R34 Poster  v3.0
+echo   BoozStudio - R34 Poster  v3.2.0
 echo  ============================================================
 echo.
 
